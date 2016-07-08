@@ -1,0 +1,88 @@
+#!/bin/bash
+
+#################################################################################
+#                                                                               #
+# Copyright 2016 Augustyn Kończak                                               #
+#                                                                               #
+# Licensed under the Apache License, Version 2.0 (the "License");               #
+# you may not use this file except in compliance with the License.              #
+# You may obtain a copy of the License at                                       #
+#                                                                               #
+#    http://www.apache.org/licenses/LICENSE-2.0                                 #
+#                                                                               #
+# Unless required by applicable law or agreed to in writing, software           #
+# distributed under the License is distributed on an "AS IS" BASIS,             #
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      #
+# See the License for the specific language governing permissions and           #
+# limitations under the License.                                                #
+#                                                                               #
+#################################################################################
+
+
+gitstatus="git status";
+gitadd="git add somefile.*";
+gitaddall="git add -a";
+gitcommit="git commit";
+gitcommitmsg="git commit -m";
+gitcommitall="git commit -a";
+gitcommitallmsg="git commit -m";
+gitstash="git stash";
+gitstashsave="git stash save";
+gitstashlist="git stash list";
+gitstashpop="git stash pop";
+gitstashapply="git stash apply";
+gitusername="git config --global user.name 'Augustyn Kończak'"
+gitmail="git config --global user.mail 'augustyn.konczak@hycom.pl'"
+gitconfig="git config -l"
+# Helpers:
+timestamp=$(date +"%H%M%S");
+esc="\033[0m"
+command="\033[36;40m"
+bashtxt="\033[37;40m";
+bold="\033[31;40m";
+soft="\033[33;40m"
+echo -e "\n\033[32;40;1mTracking changes.${esc}\n"
+echo -e "We have clean, cloned repository. Write ${command}git status${esc}, to see it's status:\n"; echo -e "$(eval ${gitstatus})";
+read; clear;
+echo -e "\nLet's create a file so we could track it changes. ${bashtxt}echo > somefile.${timestamp}${esc}"; $(echo $(date +"%s") > somefile.${timestamp});
+echo -e "New files have status ${soft}\"Untracked\"${esc}; \nYou can see it by checking status: ${command}git status${esc}.\n"; echo -e "$(eval ${gitstatus})";
+read;
+echo -e "\nNew files ${bold}WON'T${esc} be tracked, unless you ${bold}EXCPLICLY${esc} add them to staging. It will also change file status to ${soft}Tracked${esc}\n";
+echo -e "\nLet us add file to git by invoking: ${command}git add somefile.${timestamp}${esc}.\n"; echo -e "$(eval ${gitadd})";echo -e "$(eval ${gitstatus})";
+read;
+echo -e "\nLet us modify this file, and see the status after some changes. Again by invoking: ${command}git status${esc}\n";$(echo $(date +"%s") > somefile.${timestamp}); echo -e "$(eval ${gitstatus})";
+read;
+echo -e "\nNevertheless file changes it ${bold}WON'T be commited${esc}, as long as you won't ${bold}EXCPLICLY${esc} add it to ${soft}staging${esc}/index."
+echo -e "To add changes write ${command}git add changedfiles${esc}, or ${command}git add --all${esc}, to add all files.\n"; echo -e "$(eval ${gitadd})";
+echo -e "\nModified file is now in ${bold}STAGING${esc} area. ${soft}Tracked${esc}, prepared for commit. Any ${soft}changes${esc} to the file from now on, ${soft}won't${esc} affect ${bold}staging${esc}. It's state is ${soft}'frozen'${esc} untill either commit, or another git add or it will be unstaged\n"; echo -e "$(eval ${gitstatus})"
+read;
+echo -e "\nLet's commit the changes...\nBut wait!"
+echo -e "We didn't define username nor email of a commiter! Let's fix this issue right now, shall we?"
+echo -e "There are three types of config: system, global, local. First is ${soft}/etc/gitconfig${esc}, second is in user home: ${soft}$HOME/.gitconfig${esc} third config is local to git repository - .gitconfig"
+echo -e "We will add config to global (user home directory config file) config. To do so, we we'll use argument ${soft}--global${esc}, to modify system repository use ${soft}--system${esc} and ${soft}--local${esc} for local repository config. \nFirst let's add user name of commiter, with ${command}${gitusername}${esc}, then user mail with: ${command}${gitmail}${esc}"; echo -e "$(eval ${gitusername}) $(eval ${gitmail})";
+echo -e "To verify your non default configs use ${command}${gitconfig}${esc}\n"; echo -e "$(eval ${gitconfig})";
+read;
+echo -e "\nNow, we are ready to commit! To do so, write ${command}${gitcommit}${esc}. It will open your favorite ${bold}\$EDITOR${esc} editor (ex. ${soft}vim${esc}) and allow to write comment for commit.";
+echo -e "Another way to add comment, is passing ${soft}-m${esc} argument: ${command}${gitcommitmsg}${esc}. It must be followed by commit message hopefully sorrounded by \" \".\nTo add all files with passing the staging area (all ${bold}tracked${esc} files - that are known to git) add ${soft}-a${esc} parameter: ${command}${gitcommitallmsg} 'commit messages'${esc}\n"; 
+echo -e "$(eval ${gitcommitallmsg} \"adding some changes. file with timestamp\")";
+read;
+echo -e "\nIf you ${soft}don't${esc} want to ${soft}commit${esc}, but ${bold}localy STORE${esc} your promissing changeset, or you want to take a pick on not modified repository - you would want to add your changes to ${bold}STASH${esc}, instead commmiting."
+echo -e "'${command}git stash${esc}' command will give you ${soft}CLEAN repository${esc}, without any changes you made and all your work will be ${soft}safe${esc} locally ${soft}stored${esc} in stash. Let's see how this works."
+echo -e "After previous commit we already have clean repository, as ${command}git status${esc} says:\n"; echo -e "$(eval ${gitstatus})"
+echo -e "\nSo, again we need to modify content, add it to ${soft}stage${esc}/index and than we can stash it.\n";$(echo $(date +"%s") > somefile.${timestamp} && eval ${gitadd}); echo -e "$(eval ${gitstatus})";
+echo -e "\nAs you can see the repository was clean, we made some changes and now we are ready to ${bold}STASH${esc} it\n"; 
+read; 
+echo -e $(eval ${gitstash})
+echo -e "\nRepository is clean, as ${command}git status${esc} shows:\n"; echo -e "$(eval ${gitstatus})";
+echo -e "\nWhere are our changes!?\nAs I said they are safely ${soft}stored${esc} in stash. It is a safehouse you can bring up any time after stashing. Even on different branch, if you decide to create branch from clean repository. So, let's list it with: ${command}git stash list${esc} \n"; echo -e "$(eval ${gitstashlist})"
+read;
+echo -e "\nWe can either ${bold}POP${esc} stored changes - that is bring them back from stash and clear it, or ${bold}APPLY${esc} changes to workspace, and leave it in stash for later use."
+echo -e "Let us pop those changes, and than add them with pretty name, that does mean something useful - that is not revision 'number'. ${command}git stash pop${esc}, and than ${command}git stash save tag-name${esc} and to reapply them:${command}git apply${esc} \n";
+echo -e "$(eval ${gitstashpop}) $(eval ${gitstashsave} \'test_tag_4_stash\') $(eval ${gitstashapply})"
+echo -e "\nAfter all we did reapply those changes back to workspace. \nYou can pop/apply either by revision, stash number ${bold}stash@{0}${esc}, or without arguments - latest"
+read;
+if [ -f git.04.resolve.conflicts ]; then
+. git.04.resolve.conflicts
+else 
+. ../git.04.resolve.conflicts;
+fi

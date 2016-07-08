@@ -1,0 +1,79 @@
+#!/bin/bash
+
+#################################################################################
+#                                                                               #
+# Copyright 2016 Augustyn Kończak                                               #
+#                                                                               #
+# Licensed under the Apache License, Version 2.0 (the "License");               #
+# you may not use this file except in compliance with the License.              #
+# You may obtain a copy of the License at                                       #
+#                                                                               #
+#    http://www.apache.org/licenses/LICENSE-2.0                                 #
+#                                                                               #
+# Unless required by applicable law or agreed to in writing, software           #
+# distributed under the License is distributed on an "AS IS" BASIS,             #
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      #
+# See the License for the specific language governing permissions and           #
+# limitations under the License.                                                #
+#                                                                               #
+#################################################################################
+
+
+##Config:
+conflict="file_with_conflict";
+branchname="development";
+##Commands:
+createbranch="git branch ${branchname}";
+modifyfile="echo $(date +"%s") > ${conflict}"
+add="git add ${conflict}"
+commit="git commit -m \"creating conflicts\""
+switchtobranch="git checkout ${branchname}"
+switchtomaster="git checkout master"
+merge="git merge ${branchname}";
+mergetool="git mergetool meld";
+##Helpers
+msg01="this is example line that might generate conflicts"
+msg1="echo ${msg01} > ${conflict}";
+msg02="this is example line that will not gnerate conflicts"
+msg2="echo ${msg02} > ${conflict}";
+msg03="this is line that will cause all conflicts"
+msg3="echo ${msg03} > ${conflict}";
+meld="$(whereis meld|awk -F':' '{print $2}')";
+if [ "x$meld" == "x" ]; then
+	meld="vimdiff";
+else 
+	meld="meld";
+fi
+timestamp=$(date +"%H%M%S");
+esc="\033[0m"
+command="\033[36;40m"
+bashtxt="\033[37;40m";
+bold="\033[31;40m";
+soft="\033[33;40m"
+echo -e "\n\033[32;40;1mResolving conflicts${esc}\n"
+echo -e "${strong}Conflict${esc} is when we have change to the ${soft}same file${esc}, the ${soft}same line${esc}, it two diffrent branches.";
+echo -e "Not as uncommon as one would like\n";
+read;
+echo -e "We are going to generate conflict so you can learn how to deal with it in git";
+echo -e "This script will create new branch ${soft}${branchname}${esc} with file ${soft}${conflict}${esc} to create within conflict";
+echo -e "Than it will change the same file in master branch so we acctually ${soft}have${esc} conflict";
+echo -e "Preforming magic, please wait...\n";
+echo -e "$(eval ${createbranch}) $(eval ${switchtobranch})";
+echo -e "$(eval ${msg1})";echo -e "$(eval ${add})";echo -e "$(eval ${commit})";
+sleep 2;
+echo -e "$(eval ${msg2})";echo -e "$(eval ${add})";echo -e "$(eval ${commit})";
+sleep 2;
+echo -e "$(eval ${switchtomaster})";
+echo -e "$(eval ${msg3})";echo -e "$(eval ${add})";echo -e "$(eval ${commit})";
+echo -e "\nWe should have conflict now, when we try to perform merge of two branches. To do merge of ${branchname} to master use command ${command}${merge}${esc}.\nWe'll try this now.\nHold your fingers for me ;)";
+read;
+echo -e "$(eval ${merge})";
+echo -e "\nSo, let's fire ${soft}mergetool${esc}\nI'm lazy, so I'll try to use graphical tool. You can of course use your favourite ${soft}vimdiff${esc}";
+echo -e "Nevertheless, git writes about possible mergetools just after invoking ${command}${merge}${esc}"; echo -e "$(eval ${mergetool})";
+read;
+
+if [ -f git.05.working.with.multiple.repositories ];then
+. git.05.working.with.multiple.repositories;
+else
+. ../git.05.working.with.multiple.repositories;
+fi

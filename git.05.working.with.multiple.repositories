@@ -1,0 +1,114 @@
+#!/bin/bash
+
+#################################################################################
+#                                                                               #
+# Copyright 2016 Augustyn Kończak                                               #
+#                                                                               #
+# Licensed under the Apache License, Version 2.0 (the "License");               #
+# you may not use this file except in compliance with the License.              #
+# You may obtain a copy of the License at                                       #
+#                                                                               #
+#    http://www.apache.org/licenses/LICENSE-2.0                                 #
+#                                                                               #
+# Unless required by applicable law or agreed to in writing, software           #
+# distributed under the License is distributed on an "AS IS" BASIS,             #
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      #
+# See the License for the specific language governing permissions and           #
+# limitations under the License.                                                #
+#                                                                               #
+#################################################################################
+
+##Config:
+oalias="origin";
+ualias="upstream"
+dir="git-tutorial-directory"
+##Commands:
+#origin="git clone ${oalias} git@github.com:Augustyn/git-tutorial.git ${dir}"
+#upstream="git remote add ${ualias} git@github.com:Augustyn/git-tutorial.git"
+origin="git clone file://$HOME/git/git-tutorial ${dir}"
+upstream="git remote add ${ualias} file://$HOME/git-tutorial-bare"
+remotes="git remote -v"
+remotebranch="git branch -r"
+fetch="git fetch --all"
+fetchtags="git fetch -t ${ualias}"
+pull="git pull"; 
+pullorgin="git pull ${oalias} master";
+pullshort="git pull ${ualias}"
+push="git push ${oalias}";
+pushdev="git push ${oalias} development";
+pushbranch="git push ${oalias} personal:development";
+pushdelete="git push ${oalias} :development";
+checkout="git checkout ${oalias}/master";
+merge="git merge master";
+track="git branch --set-upstream master upstream/master"
+##Helpers
+filename="some_file_to_commit"
+add="git add ${filename}"
+commit="git commit -m "
+msg01="this is example line with random $(($RANDOM%$(date +'%s')))"
+msg1="echo \"${msg01}\" > ${filename}";
+msg2="echo 'this is example line with some random number: $(($RANDOM%$(date +'%s')))' > ${filename}";
+esc="\033[0m"
+command="\033[36;40m"
+bashtxt="\033[37;40m";
+bold="\033[31;40m";
+soft="\033[33;40m"
+
+# Tutorial:
+echo -e "\n\033[32;40;1mPraca z wieloma zdalnymi repozytoriami - ${soft}github.com\033[32;40;1m etc.${esc}\n"
+echo -e "Przedstawione w tej części nazwy repozytoriów są ${bold}przykładowe${esc}. Git nie wymusza ${soft}aliasu${esc} który użyjemy dla zdalnego repozytorium. Użyte nazwy są często spotykane w podręcznikach, przykładach, tutorialach stąd użycie ich w tym kontekście będzie później owocować lepszym zrozumieniem opisu bardziej zaawansowanych technik pracy z git-em."
+echo -e "Wpierw pobierzemy, ${soft}${oalias}${esc}, klona repozytorium do którego mamy prawa zapisu używając:\n ${command}${origin}${esc}";
+echo -e "\nGit ${bold}domyślnie${esc} traktuje repozytorium z którego klonujemy jako ${oalias} \n"
+echo -e "Następnie dodamy zdalne repozytorium 'wzorcowe', do którego nie mamy praw zapisu."
+echo -e "Kod w repozytorium wzorcowym oznacza stabilną wersję, na podstawie której następuje dalszy, jednostkowy rozwój"
+echo -e "Nazwiemy je ${soft}${ualias}${esc} - źródło, z którego będziemy pobierać najświeższe stabilne repozytorium."
+echo -e "Aby dodać repozytorium zdalne, należy wykonać komendę:\n ${command}${upstream}${esc}\n";
+read;
+echo -e "$(eval ${origin})"; cd ${dir}; 
+echo -e "$(eval ${upstream})";
+echo -e "\nPobierzmy (jeszcze raz) dane z repozytorium wzorcowego ${soft}${ualias}${esc}, tym razem za pomocą ${command}${fetch}${esc}. Komenda pozwala nam zajrzeć do każdego zdalnego repozytorium, ale nie wykonuje żadnych zmian na naszej lokalnej gałęzi. Możemy zamiast --all podać nazwę zdalnego repozytorium, aby ograniczyć pobieranie rewizji do jednego z zdalnych repozytoriów. ${soft}Tagi${esc} nie są domyślnie pobierane. Aby je pobrać należy użyć ${command}${fetchtags}${esc} \n";
+read;
+echo -e "$(eval ${fetch}) $(eval ${fetchtags})";
+echo -e "\nAby pobrać zmiany i jednocześnie wykonać merge do naszego repozytorium należy użyc ${command}${pullorigin}${esc}";
+echo -e "Pull jest głupim narzędziem. Próbuje pobrać i wykonać ${bold}merge${esc} gałąź której nazwę podaliśmy na ten branch na którym aktualnie jesteśmy i ${bold}tylko${esc}. Nie rusza za to pozostałych branchy. Do synchronizowania w ten sposób wszystkich branchy polecam pogooglać za 'git-up'.\n"; echo -e "$(eval ${pullorigin})";
+echo -e "\nAnalogicznie postępujemy w przypadku aliasu ${soft}${ualias}${esc}. Znów musimy podać branch, chyba że skonfigurujemy sobie git inaczej."
+read;
+echo -e "Nazwy branch-a nie musimy podawać, jeśli wcześniej skonfigurowaliśmy sobie git do ${soft}śledzenia${esc} przez lokalny branch - zdalnego brancha"
+echo -e "Zróbmy to teraz: ${command}${track}${esc} \n"; echo -e "$(eval ${track})"
+echo -e "\nTeraz możemy wykonać skróconą komendę pobierania i merge danych: ${command}${pull} ${ualias}${esc} \n"; echo -e "$(eval ${pull} ${ualias})"
+read;
+echo -e "\nZdalne repozytoria możemy zobaczyć przez ${command}${remotes}${esc} a branch-e jakie posiadają zdalne repozytoria: ${command}${remotebranch}${esc}.";
+echo -e "Zobaczmy jak to wygląda. Remote: \n"; read;
+echo -e "$(eval ${remotes})"; 
+echo -e "\nBranche:\n"; echo -e "$(eval ${remotebranch})";
+echo -e "\n${bold}Każdy${esc} branch zdalnego repozytorium posiada ${bold}prefix${esc} - w naszym przypadku ${soft}${oalias}${esc} i ${soft}${ualias}${esc}. Prefix od nazwy branch-a oddziela slash.\nRola w jakiej zostaną użyte zdalne repozytoria (${ualias}/${oalias}) nie ma dla git znaczenia. Grunt bywiedzieć gdzie zmiany pchać, skąd ciągnąć. Równie dobrze mogą się zwać 'ssacz' i 'pchacz'. Oczywiście możemy używać tylko jednego repozytorium, aczkolwiek praca z repozytoriami git wymusza taki model pracy."
+echo -e "\nWykonajmy więc zmiany na naszym repozytorium lokalnym i wypchnijmy (${soft}push${esc}) je. Prawa zapisu zazwyczaj będziemy mieli tylko w ${soft}${oalias}${esc}, więc tam ślemy zmiany"
+read;
+echo -e "$(eval ${msg1} ; ${add} ; ${commit} \'first commit\')"; sleep 1;
+echo -e "$(eval ${msg2})";echo -e "$(eval ${add})";echo -e "$(eval ${commit} \'second commit\')";
+echo -e "\nWykonaliśmy zmiany na pliku ${filename}. Są w naszej gałęzi w naszym repozytorium ${soft}lokalnym${esc}."
+read;
+echo -e "Możemy wykonać ${soft}merge${esc} do gałęzi repozytorium ${soft}${oalias}${esc} lub wypchnąć ${soft}push${esc} bezpośrednio do repozytorium ${soft}zdalnego${esc}"
+echo -e "Wpierw punkt pierwszy. Gałęzie zdalne mają przedrostek \"${oalias}/\". Wpierw robimy ${command}${checkout}${esc} i ${bold}merge${esc} z master\n"
+read;
+echo -e "$(eval ${checkout}) $(eval git status) $(eval ${merge})";
+echo -e " ...i jesteśmy gotowi wypychnąć (${soft}push${esc}) zmiany na zdalne repozytorium - ${oalias}. Wykonujemy, jak się domyślamy - ${command}${push}${esc}\n";
+echo -e "$(eval ${push})";
+echo -e "${bold}uwaga${esc} - wypchnięcie gałęzi na gałąź o tej samej nazwie na do zdalnego repozytorium które nie jest \'bare\' skończy się błędem:\n  ! [remote rejected] master -> master (branch is currently checked out) \n W związku z tym, że push zmian jest przeprowadzany w całości po stronie zdalnej, nie ma dostępu do indeksu itp. może dojśc do błędów i utraty commitów. Aby temu zapobiec należy wykonać push na inny branch i po zdalnej stronie wykonać merge.\n Problem nie występuje w repozytoriach \"bare\", gdzie nie ma plików, tylko metadane git-a.";
+echo -e "\nNie możemy wypchnąć(push) zmian do repozytorium ${ualias}, bo nie mamy tam praw do zapisu - próba wypchnięcia skończy się błędem. Jednak możemy wykonać próbować. (ja nie spróbuje, bo prawa zapisu mam ;)). Praca domowa.";
+echo -e ""
+read;
+echo -e "Drugi sposób wypchnięcia zmian - wskazanie innej niż obecna gałąź, na zdalną gałąź. Tu sprawa się komplikuje - jak rozpoznać na jakich branch wyślemy zmiany? Możemy chcieć zrobić push np. master=>development. Wpierw domyślne zachowanie git-a:"
+echo -e "Do git 2.0 domyślną opcją było ${bold}\"matching\"${esc} - nazwa lokalnego branch była wypychana na ${soft}pasującą${esc} nazwę zdalnego branch-a, wypychając ${bold}wszystkie${esc} lokalne zmiany do pasujących branch-y zdalnych. Od wersji 2.0 domyślną opcją jest ${bold}\"simple\"${esc} - wykonując ${command}${push}${esc} wypychamy tylko obecną gałąź. Zachowanie analogiczne do git pull."
+echo -e "Aby zatem wypchnąć inną lokalną gałąź niż ta na której się obecnie znajdujemy wykonujemy - ${command}${pushdev}${esc} - w ten sposób możemy wypchnąć tylko gałąź na której jesteśmy do zdalnej ${soft}istniejącej${esc} gałęzi"; #$(eval ${pushdev});
+echo -e "Wypchnięcie innej gałęzi niż ta na której się znajdujemy, lub ${soft}stworzenie${esc} innego zdalnego brancha - miłośnicy SSH poczują się swojsko - wystarczy podać nazwę loklanego branch i po dwukropku cel np. ${command}${pushbranch}${esc} \n"; echo -e "$(eval ${pushbranch})";
+echo -e "Gdy ${soft}nie ma${esc} gałęzi docelowej - zostanie ona ${soft}utworzona${esc} \n"; 
+echo -e "Gdy nie podamy nazwy gałęzi lokalnej - zdalna zostanie usunięte - ${command}${pushdelete}${esc}";
+
+read;
+
+if [ -f git.06.fixing.history ];then
+. git.06.fixing.history ;
+else
+. ../git.06.fixing.history ;
+fi

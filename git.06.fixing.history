@@ -1,0 +1,117 @@
+#!/bin/bash
+
+#################################################################################
+#                                                                               #
+# Copyright 2016 Augustyn Kończak                                               #
+#                                                                               #
+# Licensed under the Apache License, Version 2.0 (the "License");               #
+# you may not use this file except in compliance with the License.              #
+# You may obtain a copy of the License at                                       #
+#                                                                               #
+#    http://www.apache.org/licenses/LICENSE-2.0                                 #
+#                                                                               #
+# Unless required by applicable law or agreed to in writing, software           #
+# distributed under the License is distributed on an "AS IS" BASIS,             #
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      #
+# See the License for the specific language governing permissions and           #
+# limitations under the License.                                                #
+#                                                                               #
+#################################################################################
+
+
+##Helpers
+filename="some_file_to_commit"
+branchname="development"
+##Commands:
+add="git add " #requires path, of filename, see example use below
+commit="git commit -m " #requires comment, see example use below
+deletebranch="git branch -D ${branchname}";
+branchdev="git branch ${branchname}"
+checkoutdev="git checkout ${branchname}";
+checkoutmaster="git checkout master";
+merge="git merge ${branchname}"
+reset="git reset --hard HEAD~2"
+graphalias="git config alias.graph log --graph --all --pretty=format:'%Cred%h%Creset - %Cgreen(%cr)%Creset %s%C(yellow)%d%Creset' --abbrev-commit --date=relative"
+#only after ${graphalias}:
+graph="git graph";
+##Helpers:
+function doCommits {
+if [ "x$1" == "x" ]; then
+	filename="some_file_to_commit";
+else
+	filename=$1;
+fi
+msg1="echo 'this is example line with some random number: $(($RANDOM%$(date +'%s')))' > ${filename}";
+msg2="echo 'this is example line with some random number: $(($RANDOM%$(date +'%s')))' > ${filename}";
+msg3="echo 'this is example line with some random number: $(($RANDOM%$(date +'%s')))' > ${filename}";
+echo -e "$(eval ${msg1}) $(eval ${add} \"${filename}\" ) $(eval ${commit} \"first commit\")"; sleep 1;
+echo -e "$(eval ${msg2}) $(eval ${add} \"${filename}\" ) $(eval ${commit} \"second commit\")"; sleep 1;
+echo -e "$(eval ${msg3}) $(eval ${add} \"${filename}\" ) $(eval ${commit} \"third commit\")"; 
+}
+esc="\e[0m"
+command="\e[36;40m"
+bashtxt="\e[37;40m";
+bold="\e[31;40m";
+soft="\e[33;40m"
+fuckNooo="\e[5;1;41;5m"
+
+#Tutorial:
+
+echo -e "\n\033[32;40;1mCofanie zmian w ${bold}lokalnej\033[32;40;1m historii git.${esc}\n"
+echo -e "\nJeśli szukasz sposobu jak poprawić rewizje w zdalnym repozytorium to zły adres. Przedstawione w tym skrypcie metody poprawy repozytorium można próbować wypchnąć na zdalne repozytorium. \n${fuckNooo}Jeśli to zrobisz będziesz przeklęty: stracisz potencje a Tw(ój/oja) partner(-ka) zwiększy swoją wykładniczo! Zostaliście ostrzeżeni!${esc}\n";
+
+echo -e "Sometimes we make mistake and commit something that we want to revert. There are few approches, most of them revertable, so don't worry."
+echo -e "First, lets create branch and commit so we have something to work on.\n"; 
+if [ -e linux-in-support-introduction ]; then
+	cd "linux-in-support-introduction";
+fi
+echo -e "$(eval ${branchdev} ; ${checkoutdev})";
+doCommits
+echo -e "$(eval ${checkoutmaster})";
+doCommits "otherfile"
+echo -e "\nLet's look at our situation right now, from new perspective. Nice and clean graph of our history. It's a feature of ${soft}git log${esc}."
+echo -e "Though it is writable I'm a bit lazy myself so let's make an ${bold}alias${esc} for it with:\n ${command}${graphalias}${esc}"
+echo -e "Now, we can as simply as write ${command}${graph}${esc} to print preety colored, well formated, straight line of our git history with graph:\n"; 
+read; 
+echo -e "$(eval ${graph})"
+echo -e "\nPreety, isn't it? :)"
+echo -e "Though you don't see names of commited files, you can easely change that by adding --name-only, or --name-status (which also shows file status - modified/added/deleted etc/)";
+echo -e "Now, let's fix an mistake we made. There are few ways to do so! \nFirst and simplest way - ${soft}detele branch${esc} and start new one, if you did your changes on new branch. Delete branch: \n${command}${deletebranch}${esc} \n"
+echo -e "$(eval ${deletebranch})";
+echo -e "\nLet's move forward. Second way, another issue where first way won't work. Now we have branch that was merged to our ${soft}master${esc}. Deleting branch is not enough, as fault commit is already in our master branch. Let's prepare an example\n"
+read;
+echo -e "$(eval ${branchdev} ; ${checkoutdev})";
+doCommits "anotherfile"
+echo -e "$(eval ${checkoutmaster})";
+doCommits "someotherfile"
+echo -e "$(eval ${merge} ; ${commit} \'commiting ${branchname} to master\')";
+echo -e "\nOkay, we have an situation here. Let's see our preety graph, shall we?\n"; 
+echo -e "$(eval ${graph})"
+echo -e "\nAwsome, it draws our branch, it will draw any other branches, too ...So, let's delete it!\n";
+read;
+echo -e "$(eval ${deletebranch})";
+echo -e "\nBranch is dead, now we have shorter graph:\n"
+read;
+echo -e "$(eval ${graph})"
+echo -e "\nBut wait! There's one commit that removing of branch didn't wipe out - merge commit. What do we do! (except panic)\nThis one commit has all change-set from out branch. It is a good way to deliver a feature, if you don't need all this little, step by steps commits. Right?";
+echo -e "Let's reset our state to the last commit before it. You can safely use revision number. I'm a script, I don't see revision number to use, and I'm too lazy to read one. so I guess I'll use git's nice feature of pointing out relative revision number. I know that it is (${soft}HEAD-1${esc}) revision number. Let's use that awesome knowledge."
+echo -e "To use our last before ${soft}HEAD${esc} revision number, or if you don't have cat to stand on your keyboard simply write pointer ${bold}HEAD~${esc} which means 'parent of HEAD revision'. It is not father, it is not mother, it's parent.\nYou can use as many pointers as you like: ${bold}HEAD~~~~${esc} means parents parents parents parent of HEAD revision - grant-grant-grant-parent.\nWhy bother to write so much. You can use shorter version: ${bold}HEAD~2${esc}. What, when you have luck to be the child of multiply parents? You can use ${soft}^${esc} as well to point which parent you seek. Complicated? Neh. You'll get use to it. HEAD~ would mean revision in master branch, as though ${bold}HEAD^2${esc} is parent revision in developers branch."
+echo -e "Oh No! I did commit!\nHave no fear, git is here! You can use both relative pointers like this:${soft}HEAD~^2${esc} Now it mean: second parent of parent - parent in second branch of our parent."
+read;
+echo -e "So, let's use it. It's going to be fun, I tell you... Command: ${command}${reset}${esc}\n";
+echo -e "$(eval ${reset})\n$(eval ${graph})"
+echo -e "\nNow see how clean our repository is. But let's blink some more:\n${fuckNooo}If you reset once pushed commits and push changes you'll never have satisfaction from sex again!!${esc}"
+echo -e "If you did push code to your origin repository... well you have fucked up hard :).\nI recommend manual reverse, and commit. It dont have to be as manual as you think. Let's use ${soft}stash${esc} area.\nLet's us prepare the case.\n"
+read;
+echo -e "$(eval ${branchdev} ; ${checkoutdev})";
+doCommits
+echo -e "$(eval ${checkoutmaster})";
+doCommits
+echo -e "$(eval ${graph})"
+echo -e "\nLet's pretend we want to go back to the state of our file ${filename} in revision: \n";
+echo -e "$(eval git show HEAD~3)"
+echo -e "\nBut we cannot reset state, as we had already pushed our changes, and we are sentimentally attached to our ${fuckNooo}sexual potential${esc}. So we figured out that we might checkout that revision, make minor change (for example add space to the line), store our changed file in stash area
+\n
+
+to be continued"
+## TODO: dokończyć reset hard 

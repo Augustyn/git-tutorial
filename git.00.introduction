@@ -1,0 +1,62 @@
+#!/bin/bash
+#################################################################################
+#                                                                               #
+# Copyright 2016 Augustyn Kończak                                               #
+#                                                                               #
+# Licensed under the Apache License, Version 2.0 (the "License");               #
+# you may not use this file except in compliance with the License.              #
+# You may obtain a copy of the License at                                       #
+#                                                                               #
+#    http://www.apache.org/licenses/LICENSE-2.0                                 #
+#                                                                               #
+# Unless required by applicable law or agreed to in writing, software           #
+# distributed under the License is distributed on an "AS IS" BASIS,             #
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.      #
+# See the License for the specific language governing permissions and           #
+# limitations under the License.                                                #
+#                                                                               #
+#################################################################################
+
+clone_repository_command="git clone git@github.com:Augustyn/git-tutorial.git"
+gitstatus="git status"
+
+# Helpers:
+timestamp=$(date +"%H%M%S");
+esc="\033[0m"
+command="\033[36;40m";
+bashtxt="\033[37;40m";
+bold="\033[31;40m";
+soft="\033[33;40m";
+green="\033[32;40m";
+
+author="Augustyn Kończak <augustyn.konczak@hycom.pl>"
+
+echo -e "\n${green}Skrypt szkoleniowy na potrzeby Praktyk.${esc}
+${green}Obsługa 'git' na przykładzie pracy z ${soft}github.com${esc}\n
+autor:${green} ${author}${esc}\n\n
+Szczegóły szkolenia:
+- tworzenie klona (${soft}clone${esc}) repozytorium,
+- utworzenie ${soft}branch${esc} repozytorium,
+- zmiana aktywnej gałęzi na inną,
+- wykonanie zmian na plikach repozytorium,
+- omówienie staging-u (${soft}staging${esc}/index)
+- omówienie przechowalni (${soft}stash${esc})
+- merge zmian do głównej gałęzi (${soft}master${esc}),
+- rozwiązywanie konfliktów podczas ${soft}merge${esc},
+- praca z zdalnymi repozytoriami:
+- ${soft}origin${esc} vs ${soft}upstream${esc},
+- wypchnięcie zmian do ${soft}origin${esc},
+- pobieranie zmian z ${soft}upstream${esc},
+- merge ${soft}upstream${esc} do naszego ${soft}origin${esc} (nasz clone),
+- rebase
+- share project,
+- usunięcie błędnego commitu z repozytorium
+- usunięcie błędnego pliku z historii commitów\n"
+echo -e "Dla późniejszego, łatwiejszego odnalezienia komend, będą one przypisane do zmiennych"
+echo -e "Skrypty zostały (mam nadzieję) zaprojektowane, tak by późniejsze samodzielne uruchomienie ich i opisy wystarczyły aby sobie wszystko przypomnieć"
+
+read next;
+#if [ "x$next" == "xtrue" ] || [ "x$next" == "x " ] || [ "x$next" == "x" ] || [ "x$next" == "xnext" ]; then
+. git.01.create.repository
+#fi
+exit 0;
